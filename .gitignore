@@ -1,4 +1,5 @@
 
 /temp
 
-Notebook.ipynb
+*.ipynb
+*.pyc
