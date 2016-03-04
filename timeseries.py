@@ -23,12 +23,17 @@ class TimeSeries():
     --------
         - interpolate: returns a new TimeSeries object with values that are generated 
           from the values within the current time series object
+        - mean: returns the mean value of the items within TimeSeries object
+        - media: returns the median value of the items within TimeSeries object
+        - itertimes: iterates over the times within the TimeSeries object
+        - itervalues: itereates over the values within the TimeSeries object
+        - iteritems: iterates over the time, value pairs within the TimeSeries object
 
     '''
     
-    def __init__(self, times=[], values=[]):
+    def __init__(self, times=[], values=None):
         
-        if not(times == []) and values == []:
+        if values==None:
             values = np.zeros(len(times))
             
         assert len(times) == len(values), "Sequence of times does not match sequences of values."
@@ -130,6 +135,18 @@ class TimeSeries():
         """
         return [(t,v) for t,v in zip(self._times,self._values)]
     
+    @property 
+    def lazy(self):
+        """
+        Return a new LazyOperation instance using an identity function and 
+        self as the only argument. This wraps up the TimeSeries instance 
+        and a function which does nothing and saves them both for later.
+        """ 
+        def func(self):
+            return self
+        
+        return LazyOperation(func, self)
+    
     def interpolate(self, times):
         """
         Takes a sequence of times and returns a new time series object with 
@@ -161,14 +178,20 @@ class TimeSeries():
             
         return TimeSeries(times, values)
     
-    @property 
-    def lazy(self):
-        """
-        Return a new LazyOperation instance using an identity function and 
-        self as the only argument. This wraps up the TimeSeries instance 
-        and a function which does nothing and saves them both for later.
-        """ 
-        def func(self):
-            return self
-        
-        return LazyOperation(func, self)
+    def mean(self):
+        return np.mean(self._values)
+    
+    def median(self):
+        return np.median(self._values)
+    
+    def itertimes(self):
+        for time in self.times:
+            yield time
+            
+    def itervalues(self):
+        for value in self.values:
+            yield value
+            
+    def iteritems(self):
+        for item in self.items:
+            yield item
